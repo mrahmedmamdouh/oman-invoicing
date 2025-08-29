@@ -24,6 +24,7 @@
     "jspdf": "^2.5.1",
     "qrcode.react": "^3.1.0",
     "recharts": "^2.8.0",
+    "@ant-design/plots": "^1.2.5",
     "react-query": "^3.39.3",
     "styled-components": "^6.0.7",
     "classnames": "^2.3.2",

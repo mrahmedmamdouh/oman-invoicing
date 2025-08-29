@@ -9,6 +9,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
     "seed": "knex seed:run",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix"
@@ -34,6 +35,9 @@
     "winston": "^3.10.0",
     "compression": "^1.7.4",
     "rate-limiter-flexible": "^2.4.2",
+    "express-rate-limit": "^6.10.0",
+    "express-validator": "^7.0.1",
+    "nodemailer": "^6.9.4",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
