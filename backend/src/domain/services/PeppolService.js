@@ -34,7 +34,7 @@ class PeppolService {
 
   transformToUBL(invoice, customer) {
     const ublInvoice = {
-      ': {
+      '': {
         xmlns: 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2',
         'xmlns:cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
         'xmlns:cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2'
@@ -82,11 +82,11 @@ class PeppolService {
       'cac:InvoiceLine': invoice.items.map((item, index) => ({
         'cbc:ID': index + 1,
         'cbc:InvoicedQuantity': {
-          ': { unitCode: item.unit.toUpperCase() },
+          '': { unitCode: item.unit.toUpperCase() },
           '_': item.quantity
         },
         'cbc:LineExtensionAmount': {
-          ': { currencyID: invoice.currency },
+          '': { currencyID: invoice.currency },
           '_': item.total.toFixed(2)
         },
         'cac:Item': {
@@ -94,7 +94,7 @@ class PeppolService {
         },
         'cac:Price': {
           'cbc:PriceAmount': {
-            ': { currencyID: invoice.currency },
+            '': { currencyID: invoice.currency },
             '_': item.unitPrice.toFixed(2)
           }
         },
@@ -110,16 +110,16 @@ class PeppolService {
       // Tax Total
       'cac:TaxTotal': {
         'cbc:TaxAmount': {
-          ': { currencyID: invoice.currency },
+          '': { currencyID: invoice.currency },
           '_': invoice.vatAmount.toFixed(2)
         },
         'cac:TaxSubtotal': {
           'cbc:TaxableAmount': {
-            ': { currencyID: invoice.currency },
+            '': { currencyID: invoice.currency },
             '_': invoice.subtotal.toFixed(2)
           },
           'cbc:TaxAmount': {
-            ': { currencyID: invoice.currency },
+            '': { currencyID: invoice.currency },
             '_': invoice.vatAmount.toFixed(2)
           },
           'cac:TaxCategory': {
@@ -135,19 +135,19 @@ class PeppolService {
       // Monetary Total
       'cac:LegalMonetaryTotal': {
         'cbc:LineExtensionAmount': {
-          ': { currencyID: invoice.currency },
+          '': { currencyID: invoice.currency },
           '_': invoice.subtotal.toFixed(2)
         },
         'cbc:TaxExclusiveAmount': {
-          ': { currencyID: invoice.currency },
+          '': { currencyID: invoice.currency },
           '_': invoice.subtotal.toFixed(2)
         },
         'cbc:TaxInclusiveAmount': {
-          ': { currencyID: invoice.currency },
+          '': { currencyID: invoice.currency },
           '_': invoice.totalAmount.toFixed(2)
         },
         'cbc:PayableAmount': {
-          ': { currencyID: invoice.currency },
+          '': { currencyID: invoice.currency },
           '_': invoice.totalAmount.toFixed(2)
         }
       }
