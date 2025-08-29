@@ -1,0 +1,68 @@
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #C8102E 0%, #009639 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.1;
+}
+
+.oman-flag {
+  position: absolute;
+  top: 20%;
+  right: 10%;
+  width: 200px;
+  height: 130px;
+  transform: rotate(-15deg);
+}
+
+.flag-red, .flag-white, .flag-green {
+  height: 33.33%;
+}
+
+.flag-red { background: #C8102E; }
+.flag-white { background: #FFFFFF; }
+.flag-green { background: #009639; }
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.language-selector {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.logo-section .app-logo {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}

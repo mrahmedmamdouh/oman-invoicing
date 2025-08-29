@@ -1,0 +1,382 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+html.rtl, html.rtl body {
+  font-family: 'Noto Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  direction: rtl;
+}
+
+#root {
+  height: 100%;
+}
+
+.app {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Oman National Colors */
+:root {
+  --oman-red: #C8102E;
+  --oman-green: #009639;
+  --oman-gold: #FFD700;
+  --oman-white: #FFFFFF;
+  
+  /* Semantic colors */
+  --primary-color: var(--oman-red);
+  --success-color: var(--oman-green);
+  --warning-color: var(--oman-gold);
+  --error-color: #ff4d4f;
+}
+
+/* Layout Styles */
+.layout-container {
+  height: 100vh;
+}
+
+.layout-sider {
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+}
+
+.logo-img {
+  height: 32px;
+  width: 32px;
+  margin-right: 12px;
+}
+
+.logo-text {
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.layout-header {
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.trigger {
+  font-size: 18px;
+  color: #666;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.user-info:hover {
+  background-color: #f5f5f5;
+}
+
+.username {
+  font-weight: 500;
+}
+
+.layout-content {
+  margin: 0;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.content-wrapper {
+  padding: 24px;
+  min-height: calc(100vh - 112px);
+}
+
+/* src/styles/rtl.css */
+.rtl {
+  direction: rtl;
+}
+
+.rtl .ant-layout-sider {
+  order: 2;
+}
+
+.rtl .ant-layout {
+  direction: rtl;
+}
+
+.rtl .logo {
+  flex-direction: row-reverse;
+}
+
+.rtl .logo-img {
+  margin-right: 0;
+  margin-left: 12px;
+}
+
+.rtl .header-right {
+  flex-direction: row-reverse;
+}
+
+.rtl .ant-table {
+  direction: rtl;
+}
+
+.rtl .ant-table-thead > tr > th {
+  text-align: right;
+}
+
+.rtl .ant-form-item-label > label {
+  text-align: right;
+}
+
+/* Arabic number formatting */
+.rtl .currency {
+  direction: ltr;
+  text-align: right;
+  unicode-bidi: bidi-override;
+}
+
+.rtl .invoice-number {
+  direction: ltr;
+  text-align: right;
+}
+
+/* RTL-specific adjustments for Ant Design */
+.rtl .ant-select-selector {
+  direction: rtl;
+}
+
+.rtl .ant-input {
+  direction: rtl;
+}
+
+.rtl .ant-input-number {
+  direction: ltr; /* Keep numbers LTR for better UX */
+}
+
+/* Loading component styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+}
+
+/* Invoice specific styles */
+.create-invoice .ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.items-table .ant-table {
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+}
+
+.totals-section {
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.total-row {
+  margin-bottom: 8px;
+}
+
+.total-row:last-child {
+  margin-bottom: 0;
+}
+
+.hijri-date {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  direction: rtl;
+}
+
+/* Page headers */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.filters-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+/* Status tags */
+.ant-tag {
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Custom scrollbar */
+.layout-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.layout-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.layout-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.layout-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .invoice-print {
+    direction: rtl;
+    font-family: 'Noto Sans Arabic', sans-serif;
+  }
+  
+  .invoice-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .invoice-details {
+    margin-bottom: 20px;
+  }
+  
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .invoice-table th,
+  .invoice-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: right;
+  }
+  
+  .invoice-footer {
+    margin-top: 20px;
+    text-align: right;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 16px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .filters-section .ant-row {
+    gap: 16px;
+  }
+  
+  .totals-section {
+    margin-top: 16px;
+  }
+  
+  .layout-sider {
+    position: fixed !important;
+    height: 100vh;
+    left: 0;
+    z-index: 999;
+  }
+  
+  .rtl .layout-sider {
+    right: 0;
+    left: auto;
+  }
+}
+
+/* Dark theme support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+  .dark-theme {
+    --bg-color: #141414;
+    --card-bg: #1f1f1f;
+    --text-color: #ffffff;
+    --border-color: #303030;
+  }
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.rtl .slide-in-right {
+  animation: slideInLeft 0.3s ease-in-out;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
