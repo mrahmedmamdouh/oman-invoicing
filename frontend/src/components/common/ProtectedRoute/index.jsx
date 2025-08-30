@@ -14,7 +14,6 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-export default ProtectedRoute;
 
 // src/services/api.js
 import axios from 'axios';
@@ -78,4 +77,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default ProtectedRoute;
