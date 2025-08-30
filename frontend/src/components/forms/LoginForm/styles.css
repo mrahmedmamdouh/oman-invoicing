@@ -1,0 +1,279 @@
+.login-form-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #C8102E 0%, #009639 100%);
+  position: relative;
+}
+
+.login-form-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(0, 150, 57, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.login-form-card {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-radius: 16px;
+  border: none;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+}
+
+.login-form-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo-container {
+  margin-bottom: 16px;
+}
+
+.oman-flag-mini {
+  display: inline-block;
+  width: 60px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 16px;
+}
+
+.flag-stripe {
+  height: 33.33%;
+}
+
+.flag-stripe.red {
+  background: #C8102E;
+}
+
+.flag-stripe.white {
+  background: #FFFFFF;
+}
+
+.flag-stripe.green {
+  background: #009639;
+}
+
+.login-title {
+  color: #262626;
+  margin-bottom: 8px !important;
+  font-weight: 600;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.login-submit-btn {
+  height: 48px;
+  background: linear-gradient(135deg, #C8102E 0%, #e6455a 100%);
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+  transition: all 0.3s ease;
+}
+
+.login-submit-btn:hover,
+.login-submit-btn:focus {
+  background: linear-gradient(135deg, #a50d26 0%, #C8102E 100%);
+  box-shadow: 0 6px 16px rgba(200, 16, 46, 0.4);
+  transform: translateY(-1px);
+}
+
+.login-submit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(200, 16, 46, 0.3);
+}
+
+.login-submit-btn[disabled] {
+  background: #d9d9d9;
+  box-shadow: none;
+  transform: none;
+}
+
+.forgot-password-link {
+  color: #C8102E;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: #a50d26;
+}
+
+.demo-credentials {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+}
+
+.demo-credential-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.demo-credential-item .ant-typography {
+  margin: 0;
+}
+
+.login-form-footer {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* RTL Styles */
+.rtl .login-form-container {
+  direction: rtl;
+}
+
+.rtl .login-title {
+  font-family: 'Noto Sans Arabic', sans-serif;
+}
+
+.rtl .login-subtitle {
+  font-family: 'Noto Sans Arabic', sans-serif;
+}
+
+.rtl .demo-credential-item {
+  flex-direction: row-reverse;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(200, 16, 46, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(200, 16, 46, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(200, 16, 46, 0);
+  }
+}
+
+.login-submit-btn.ant-btn-loading {
+  animation: pulse 2s infinite;
+}
+
+/* Form Input Styles */
+.login-form-card .ant-input-affix-wrapper {
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+.login-form-card .ant-input-affix-wrapper:focus,
+.login-form-card .ant-input-affix-wrapper-focused {
+  border-color: #C8102E;
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.1);
+}
+
+.login-form-card .ant-input {
+  font-size: 14px;
+}
+
+.login-form-card .ant-checkbox-wrapper {
+  font-size: 14px;
+}
+
+.login-form-card .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #C8102E;
+  border-color: #C8102E;
+}
+
+.login-form-card .ant-checkbox:hover .ant-checkbox-inner,
+.login-form-card .ant-checkbox-input:focus + .ant-checkbox-inner {
+  border-color: #C8102E;
+}
+
+/* Alert Customization */
+.login-form-card .ant-alert-error {
+  border-color: #ffccc7;
+  background-color: #fff2f0;
+}
+
+.login-form-card .ant-alert-warning {
+  border-color: #ffe7ba;
+  background-color: #fffbe6;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+  .login-form-container {
+    padding: 16px;
+  }
+  
+  .login-form-card {
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  
+  .login-form-header {
+    margin-bottom: 24px;
+  }
+  
+  .oman-flag-mini {
+    width: 50px;
+    height: 33px;
+  }
+  
+  .login-title {
+    font-size: 20px;
+  }
+  
+  .demo-credentials {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .demo-credential-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .rtl .demo-credential-item {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+/* Dark Mode Support (Future Enhancement) */
+@media (prefers-color-scheme: dark) {
+  .dark-theme .login-form-card {
+    background: #1f1f1f;
+    color: #ffffff;
+  }
+  
+  .dark-theme .login-title {
+    color: #ffffff;
+  }
+  
+  .dark-theme .demo-credentials {
+    background: #262626;
+    border-color: #434343;
+  }
+}
