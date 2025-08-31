@@ -1,0 +1,127 @@
+.form-oman .ant-form-item-label > label {
+  color: #262626;
+  font-weight: 500;
+}
+
+.form-oman .ant-form-item-label > label.ant-form-item-required::before {
+  color: #C8102E;
+}
+
+.form-oman .ant-input,
+.form-oman .ant-select-selector,
+.form-oman .ant-picker {
+  border-radius: 6px;
+  border-color: #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+.form-oman .ant-input:focus,
+.form-oman .ant-input-focused,
+.form-oman .ant-select-focused .ant-select-selector,
+.form-oman .ant-picker-focused {
+  border-color: #C8102E;
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.1);
+}
+
+.form-oman .ant-form-item-has-error .ant-input,
+.form-oman .ant-form-item-has-error .ant-select-selector,
+.form-oman .ant-form-item-has-error .ant-picker {
+  border-color: #ff4d4f;
+}
+
+.form-section {
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #f0f0f0;
+}
+
+.form-section-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-section-title::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: #C8102E;
+  border-radius: 2px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-col {
+  flex: 1;
+}
+
+/* RTL Form Styles */
+.rtl .form-oman .ant-form-item-label > label {
+  text-align: right;
+}
+
+.rtl .form-section-title {
+  flex-direction: row-reverse;
+}
+
+.rtl .form-section-title::before {
+  order: 2;
+}
+
+.rtl .form-row {
+  flex-direction: row-reverse;
+}
+
+/* Form Validation */
+.validation-success {
+  border-color: #52c41a !important;
+}
+
+.validation-success:focus {
+  box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.1) !important;
+}
+
+.validation-error {
+  border-color: #ff4d4f !important;
+}
+
+.validation-error:focus {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1) !important;
+}
+
+/* Custom Input Groups */
+.input-group-oman {
+  display: flex;
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  overflow: hidden;
+}
+
+.input-group-oman .ant-input {
+  border: none;
+  border-radius: 0;
+}
+
+.input-group-oman .input-group-addon {
+  background: #fafafa;
+  padding: 4px 11px;
+  display: flex;
+  align-items: center;
+  color: #666;
+  border-left: 1px solid #d9d9d9;
+}
+
+.rtl .input-group-oman .input-group-addon {
+  border-left: none;
+  border-right: 1px solid #d9d9d9;
+}

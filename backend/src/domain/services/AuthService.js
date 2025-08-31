@@ -10,71 +10,93 @@ class AuthService {
   }
 
   async login(email, password) {
-    const user = await this.userRepository.findByEmail(email);
-    
-    if (!user || !user.isActive) {
-      return { success: false, message: 'Invalid credentials' };
+    try {
+      const user = await this.userRepository.findByEmail(email);
+      
+      if (!user || !user.isActive) {
+        return { success: false, message: 'Invalid credentials' };
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+      
+      if (!isPasswordValid) {
+        return { success: false, message: 'Invalid credentials' };
+      }
+
+      // Update last login
+      await this.userRepository.updateLastLogin(user.id);
+
+      // Generate tokens
+      const tokens = await this.generateTokens(user);
+
+      // Store refresh token in Redis (if available)
+      if (this.redisClient) {
+        try {
+          await this.redisClient.setex(`refresh_token:${user.id}`, 7 * 24 * 60 * 60, tokens.refreshToken);
+        } catch (redisError) {
+          console.warn('Redis not available for refresh token storage:', redisError.message);
+        }
+      }
+
+      return {
+        success: true,
+        user: this.sanitizeUser(user),
+        token: tokens.accessToken,
+        refreshToken: tokens.refreshToken
+      };
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, message: 'Login failed' };
     }
-
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    
-    if (!isPasswordValid) {
-      return { success: false, message: 'Invalid credentials' };
-    }
-
-    // Update last login
-    await this.userRepository.updateLastLogin(user.id);
-
-    // Generate tokens
-    const tokens = await this.generateTokens(user);
-
-    // Store refresh token in Redis
-    await this.redisClient.setex(`refresh_token:${user.id}`, 7 * 24 * 60 * 60, tokens.refreshToken);
-
-    return {
-      success: true,
-      user: this.sanitizeUser(user),
-      token: tokens.accessToken,
-      refreshToken: tokens.refreshToken
-    };
   }
 
   async register(userData) {
-    // Check if user exists
-    const existingUser = await this.userRepository.findByEmail(userData.email);
-    if (existingUser) {
-      throw new Error('User already exists');
+    try {
+      // Check if user exists
+      const existingUser = await this.userRepository.findByEmail(userData.email);
+      if (existingUser) {
+        throw new Error('User already exists');
+      }
+
+      // Hash password
+      const passwordHash = await bcrypt.hash(userData.password, 12);
+
+      // Create user
+      const user = new User({
+        ...userData,
+        passwordHash,
+        isActive: true
+      });
+
+      const savedUser = await this.userRepository.save(user);
+      const tokens = await this.generateTokens(savedUser);
+
+      return {
+        success: true,
+        user: this.sanitizeUser(savedUser),
+        token: tokens.accessToken,
+        refreshToken: tokens.refreshToken
+      };
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
     }
-
-    // Hash password
-    const passwordHash = await bcrypt.hash(userData.password, 12);
-
-    // Create user
-    const user = new User({
-      ...userData,
-      passwordHash,
-      isActive: true
-    });
-
-    const savedUser = await this.userRepository.save(user);
-    const tokens = await this.generateTokens(savedUser);
-
-    return {
-      success: true,
-      user: this.sanitizeUser(savedUser),
-      token: tokens.accessToken,
-      refreshToken: tokens.refreshToken
-    };
   }
 
   async refreshToken(refreshToken) {
     try {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
       
-      // Check if refresh token exists in Redis
-      const storedToken = await this.redisClient.get(`refresh_token:${decoded.userId}`);
-      if (!storedToken || storedToken !== refreshToken) {
-        return { success: false, message: 'Invalid refresh token' };
+      // Check if refresh token exists in Redis (if available)
+      if (this.redisClient) {
+        try {
+          const storedToken = await this.redisClient.get(`refresh_token:${decoded.userId}`);
+          if (!storedToken || storedToken !== refreshToken) {
+            return { success: false, message: 'Invalid refresh token' };
+          }
+        } catch (redisError) {
+          console.warn('Redis not available for token verification:', redisError.message);
+        }
       }
 
       const user = await this.userRepository.findById(decoded.userId);
@@ -84,8 +106,14 @@ class AuthService {
 
       const tokens = await this.generateTokens(user);
       
-      // Update stored refresh token
-      await this.redisClient.setex(`refresh_token:${user.id}`, 7 * 24 * 60 * 60, tokens.refreshToken);
+      // Update stored refresh token (if Redis available)
+      if (this.redisClient) {
+        try {
+          await this.redisClient.setex(`refresh_token:${user.id}`, 7 * 24 * 60 * 60, tokens.refreshToken);
+        } catch (redisError) {
+          console.warn('Redis not available for token storage:', redisError.message);
+        }
+      }
 
       return {
         success: true,
@@ -100,7 +128,9 @@ class AuthService {
   async logout(refreshToken) {
     try {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-      await this.redisClient.del(`refresh_token:${decoded.userId}`);
+      if (this.redisClient) {
+        await this.redisClient.del(`refresh_token:${decoded.userId}`);
+      }
       return { success: true };
     } catch (error) {
       return { success: false };
@@ -150,7 +180,13 @@ class AuthService {
     await this.userRepository.save(updatedUser);
     
     // Invalidate all refresh tokens
-    await this.redisClient.del(`refresh_token:${userId}`);
+    if (this.redisClient) {
+      try {
+        await this.redisClient.del(`refresh_token:${userId}`);
+      } catch (redisError) {
+        console.warn('Redis not available for token cleanup:', redisError.message);
+      }
+    }
 
     return { success: true };
   }
@@ -159,7 +195,8 @@ class AuthService {
     const payload = {
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      permissions: user.permissions
     };
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -176,6 +213,7 @@ class AuthService {
   }
 
   sanitizeUser(user) {
+    // Remove sensitive data
     const { passwordHash, ...sanitizedUser } = user;
     return sanitizedUser;
   }

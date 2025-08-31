@@ -2,11 +2,24 @@ const express = require('express');
 const { body, query } = require('express-validator');
 const InvoiceController = require('../controllers/InvoiceController');
 const authMiddleware = require('../middleware/auth');
-const roleMiddleware = require('../middleware/role');
-const rateLimitMiddleware = require('../middleware/rateLimit');
+const { requireRole } = require('../middleware/role');
+const { standardLimit, createLimit, downloadLimit } = require('../middleware/rateLimit');
+const { handleValidationErrors } = require('../middleware/validation');
 
-// Initialize controller with dependencies (would be done through DI container in real app)
-const invoiceController = new InvoiceController(/* inject invoice service */);
+// Import services and repositories
+const InvoiceService = require('../../domain/services/InvoiceService');
+const InvoiceRepositoryImpl = require('../../infrastructure/database/repositories/InvoiceRepositoryImpl');
+const CustomerRepositoryImpl = require('../../infrastructure/database/repositories/CustomerRepositoryImpl');
+const TaxService = require('../../domain/services/TaxService');
+const PeppolService = require('../../domain/services/PeppolService');
+
+// Initialize dependencies  
+const invoiceRepository = new InvoiceRepositoryImpl();
+const customerRepository = new CustomerRepositoryImpl();
+const taxService = new TaxService(null, null); // Will need proper tax repository
+const peppolService = new PeppolService(null); // Will need proper PEPPOL gateway
+const invoiceService = new InvoiceService(invoiceRepository, customerRepository, taxService, peppolService);
+const invoiceController = new InvoiceController(invoiceService);
 
 const router = express.Router();
 
@@ -32,47 +45,50 @@ const updateInvoiceValidation = [
 
 // Routes
 router.get('/', 
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   invoiceController.getInvoices.bind(invoiceController)
 );
 
 router.get('/statistics',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   invoiceController.getInvoiceStatistics.bind(invoiceController)
 );
 
 router.get('/:id',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   invoiceController.getInvoiceById.bind(invoiceController)
 );
 
 router.get('/:id/download',
-  rateLimitMiddleware.downloadLimit,
+  downloadLimit,
   query('format').optional().isIn(['pdf', 'xml']),
+  handleValidationErrors,
   invoiceController.downloadInvoice.bind(invoiceController)
 );
 
 router.post('/',
-  rateLimitMiddleware.createLimit,
+  createLimit,
   createInvoiceValidation,
+  handleValidationErrors,
   invoiceController.createInvoice.bind(invoiceController)
 );
 
 router.put('/:id',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   updateInvoiceValidation,
+  handleValidationErrors,
   invoiceController.updateInvoice.bind(invoiceController)
 );
 
 router.post('/:id/finalize',
-  rateLimitMiddleware.standardLimit,
-  roleMiddleware.requireRole(['admin', 'manager']),
+  standardLimit,
+  requireRole(['admin', 'manager']),
   invoiceController.finalizeInvoice.bind(invoiceController)
 );
 
 router.delete('/:id',
-  rateLimitMiddleware.standardLimit,
-  roleMiddleware.requireRole(['admin']),
+  standardLimit,
+  requireRole(['admin']),
   invoiceController.deleteInvoice.bind(invoiceController)
 );
 

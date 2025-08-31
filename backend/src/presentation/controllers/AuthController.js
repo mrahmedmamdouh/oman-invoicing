@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
-const { AuthService } = require('../../domain/services/AuthService');
 const logger = require('../../shared/utils/logger');
 
 class AuthController {
@@ -11,15 +10,6 @@ class AuthController {
 
   async login(req, res, next) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          error: 'Validation failed',
-          errors: errors.array(),
-          message_ar: 'فشل في التحقق من البيانات'
-        });
-      }
-
       const { email, password } = req.body;
 
       const result = await this.authService.login(email, password);
@@ -50,15 +40,6 @@ class AuthController {
 
   async register(req, res, next) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          error: 'Validation failed',
-          errors: errors.array(),
-          message_ar: 'فشل في التحقق من البيانات'
-        });
-      }
-
       const userData = req.body;
       const result = await this.authService.register(userData);
 
@@ -130,7 +111,7 @@ class AuthController {
 
   async getCurrentUser(req, res, next) {
     try {
-      const user = await this.authService.getUserById(req.user.id);
+      const user = await this.authService.getUserById(req.user.userId);
 
       res.json({
         success: true,
@@ -143,17 +124,8 @@ class AuthController {
 
   async updateProfile(req, res, next) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          error: 'Validation failed',
-          errors: errors.array(),
-          message_ar: 'فشل في التحقق من البيانات'
-        });
-      }
-
       const updateData = req.body;
-      const user = await this.authService.updateProfile(req.user.id, updateData);
+      const user = await this.authService.updateProfile(req.user.userId, updateData);
 
       logger.info(`Profile updated: ${req.user.email}`);
 
@@ -168,3 +140,5 @@ class AuthController {
     }
   }
 }
+
+module.exports = AuthController;

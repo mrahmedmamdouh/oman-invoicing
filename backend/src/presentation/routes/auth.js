@@ -2,9 +2,30 @@ const express = require('express');
 const { body } = require('express-validator');
 const AuthController = require('../controllers/AuthController');
 const authMiddleware = require('../middleware/auth');
-const rateLimitMiddleware = require('../middleware/rateLimit');
+const { standardLimit, loginLimit } = require('../middleware/rateLimit');
+const { handleValidationErrors } = require('../middleware/validation');
+const ReportController = require('../controllers/ReportController');
+const { requirePermission } = require('../middleware/role');
+const { standardLimit, downloadLimit } = require('../middleware/rateLimit');
 
-const authController = new AuthController(/* inject auth service */);
+// Import services and repositories
+const AuthService = require('../../domain/services/AuthService');
+const UserRepositoryImpl = require('../../infrastructure/database/repositories/UserRepositoryImpl');
+const { redisClient } = require('../../config/redis');
+const ReportService = require('../../domain/services/ReportService');
+const GenerateReportUseCase = require('../../application/use-cases/GenerateReport');
+const InvoiceRepositoryImpl = require('../../infrastructure/database/repositories/InvoiceRepositoryImpl');
+const CustomerRepositoryImpl = require('../../infrastructure/database/repositories/CustomerRepositoryImpl');
+
+const userRepository = new UserRepositoryImpl();
+const authService = new AuthService(userRepository, redisClient);
+const authController = new AuthController(authService);
+
+const invoiceRepository = new InvoiceRepositoryImpl();
+const customerRepository = new CustomerRepositoryImpl();
+const generateReportUseCase = new GenerateReportUseCase(invoiceRepository, customerRepository);
+const reportService = new ReportService(invoiceRepository, customerRepository, generateReportUseCase);
+const reportController = new ReportController(reportService);
 
 const router = express.Router();
 
@@ -32,19 +53,21 @@ const updateProfileValidation = [
 
 // Routes
 router.post('/login',
-  rateLimitMiddleware.loginLimit,
+  loginLimit,
   loginValidation,
+  handleValidationErrors,
   authController.login.bind(authController)
 );
 
 router.post('/register',
-  rateLimitMiddleware.registerLimit,
+  standardLimit,
   registerValidation,
+  handleValidationErrors,
   authController.register.bind(authController)
 );
 
 router.post('/refresh',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   authController.refreshToken.bind(authController)
 );
 
@@ -61,7 +84,49 @@ router.get('/me',
 router.put('/profile',
   authMiddleware,
   updateProfileValidation,
+  handleValidationErrors,
   authController.updateProfile.bind(authController)
+);
+
+
+// Validation for date ranges
+const dateRangeValidation = [
+  body('startDate').optional().isISO8601().toDate(),
+  body('endDate').optional().isISO8601().toDate()
+];
+
+// Routes
+router.get('/sales',
+  standardLimit,
+  requirePermission('view_reports'),
+  dateRangeValidation,
+  handleValidationErrors,
+  reportController.getSalesReport.bind(reportController)
+);
+
+router.get('/tax',
+  standardLimit,
+  requirePermission('view_reports'),
+  dateRangeValidation,
+  handleValidationErrors,
+  reportController.getTaxReport.bind(reportController)
+);
+
+router.get('/compliance',
+  standardLimit,
+  requirePermission('view_reports'),
+  dateRangeValidation,
+  handleValidationErrors,
+  reportController.getComplianceReport.bind(reportController)
+);
+
+router.get('/export',
+  downloadLimit,
+  requirePermission('view_reports'),
+  body('type').isIn(['sales', 'tax', 'compliance']),
+  body('format').optional().isIn(['pdf', 'excel']),
+  handleValidationErrors,
+  reportController.exportReport.bind(reportController)
 );
 
 module.exports = router;

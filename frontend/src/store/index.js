@@ -5,18 +5,22 @@ import storage from 'redux-persist/lib/storage';
 import authSlice from './slices/authSlice';
 import invoicesSlice from './slices/invoicesSlice';
 import customersSlice from './slices/customersSlice';
+import reportsSlice from './slices/reportsSlice';
+import taxSlice from './slices/taxSlice';
 import settingsSlice from './slices/settingsSlice';
 
 const persistConfig = {
   key: 'oman-invoicing',
   storage,
-  whitelist: ['auth', 'settings'], // Only persist auth and settings
+  whitelist: ['auth', 'settings', 'tax'], // Persist auth, settings, and tax configuration
 };
 
 const rootReducer = combineReducers({
   auth: authSlice,
   invoices: invoicesSlice,
   customers: customersSlice,
+  reports: reportsSlice,
+  tax: taxSlice,
   settings: settingsSlice,
 });
 

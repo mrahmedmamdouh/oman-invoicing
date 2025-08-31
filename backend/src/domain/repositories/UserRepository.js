@@ -1,3 +1,5 @@
+const { v4: uuidv4 } = require('uuid');
+
 class UserRepository {
   async save(user) {
     throw new Error('Method must be implemented');

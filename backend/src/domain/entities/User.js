@@ -71,6 +71,22 @@ class User {
       errors
     };
   }
+
+  // Method to get safe user data (without sensitive info)
+  toSafeObject() {
+    const { passwordHash, ...safeUser } = this;
+    return safeUser;
+  }
+
+  // Method to get user for JWT token
+  toTokenPayload() {
+    return {
+      userId: this.id,
+      email: this.email,
+      role: this.role,
+      permissions: this.permissions
+    };
+  }
 }
 
-module.exports = { User };
+module.exports = User ;

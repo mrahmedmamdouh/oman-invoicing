@@ -1,140 +1,150 @@
+
 services:
-  postgres:
+  # PostgreSQL Database
+  db:
     image: postgres:15-alpine
     container_name: oman-invoicing-db-prod
+    restart: unless-stopped
     environment:
       POSTGRES_DB: oman_invoicing
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_INITDB_ARGS: "--locale=ar_OM.UTF-8"
+      POSTGRES_PASSWORD: P@ssw0rd123!
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     volumes:
-      - postgres_prod_data:/var/lib/postgresql/data
-      - ./backup:/backup
-    networks:
-      - oman-invoicing-prod
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  redis:
-    image: redis:7-alpine
-    container_name: oman-invoicing-redis-prod
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
-    volumes:
-      - redis_prod_data:/data
-    networks:
-      - oman-invoicing-prod
-    restart: unless-stopped
-    logging:
-      driver: "json-file" 
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: oman-invoicing-backend-prod
-    environment:
-      - NODE_ENV=production
-      - DB_HOST=postgres
-      - REDIS_HOST=redis
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     ports:
-      - "3001:3001"
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - ./backend/uploads:/app/uploads
-      - ./backend/logs:/app/logs
-      - ./certificates:/app/certificates
+      - "5432:5432"
     networks:
-      - oman-invoicing-prod
-    restart: unless-stopped
+      - oman-invoicing-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
       timeout: 10s
       retries: 3
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - REACT_APP_API_URL=https://your-domain.om/api
-    container_name: oman-invoicing-frontend-prod
-    depends_on:
-      - backend
-    networks:
-      - oman-invoicing-prod
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: oman-invoicing-redis-prod
     restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    command: redis-server --appendonly yes --requirepass "RedisP@ss123!"
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - oman-invoicing-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+  # Backend Application
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: oman-invoicing-backend-prod
+    restart: unless-stopped
+    environment:
+      # Server Configuration
+      NODE_ENV: production
+      PORT: 3001
+      FRONTEND_URL: http://localhost:3000
+
+      # Database Configuration
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: oman_invoicing
+      DB_USER: postgres
+      DB_PASSWORD: P@ssw0rd123!
+
+      # Redis Configuration  
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: RedisP@ss123!
+      REDIS_DB: 0
+
+      # JWT Configuration
+      JWT_SECRET: your-super-secret-jwt-key-for-production-2024!
+      JWT_EXPIRES_IN: 24h
+      REFRESH_TOKEN_SECRET: your-refresh-token-secret-production-2024!
+      REFRESH_TOKEN_EXPIRES_IN: 7d
+
+      # Email Configuration
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_SECURE: false
+      SMTP_USER: your-email@gmail.com
+      SMTP_PASSWORD: your-app-password
+      SMTP_FROM: noreply@oman-invoicing.om
+
+      # Company Information
+      COMPANY_NAME: Oman Invoicing Solutions
+      COMPANY_NAME_AR: حلول الفوترة العُمانية
+      COMPANY_EMAIL: info@oman-invoicing.om
+      COMPANY_PHONE: +968-24-123456
+      COMPANY_ADDRESS: Muscat, Sultanate of Oman
+
+      # Logging Configuration
+      LOG_LEVEL: info
+      LOG_FILE_PATH: ./logs/app.log
+
+      # Rate Limiting
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX_REQUESTS: 100
+
+      # Encryption
+      ENCRYPTION_KEY: your-32-character-encryption-key-prod!
+
+      # Admin Configuration
+      ADMIN_EMAIL: admin@oman-invoicing.om
+      ADMIN_EMAILS: admin1@oman-invoicing.om,admin2@oman-invoicing.om
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./backend/uploads:/app/uploads
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - oman-invoicing-network
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
     container_name: oman-invoicing-nginx-prod
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./logs/nginx:/var/log/nginx
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
     depends_on:
-      - frontend
       - backend
     networks:
-      - oman-invoicing-prod
-    restart: unless-stopped
-
-  # Monitoring with Prometheus (optional)
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    networks:
-      - oman-invoicing-prod
-    restart: unless-stopped
-
-  # Log aggregation with ELK (optional)
-  elasticsearch:
-    image: elasticsearch:8.8.0
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    networks:
-      - oman-invoicing-prod
-    restart: unless-stopped
+      - oman-invoicing-network
 
 volumes:
-  postgres_prod_data:
-  redis_prod_data:
-  prometheus_data:
-  elasticsearch_data:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local  
+  nginx_logs:
+    driver: local
 
 networks:
-  oman-invoicing-prod:
+  oman-invoicing-network:
     driver: bridge

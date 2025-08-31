@@ -1,6 +1,6 @@
-const CustomerRepository = require('../../domain/repositories/CustomerRepository');
-const { Customer } = require('../../domain/entities/Customer');
-const { db } = require('../../config/database');
+const CustomerRepository = require('../../../domain/repositories/CustomerRepository');
+const { Customer } = require('../../../domain/entities/Customer');
+const { db } = require('../../../config/database');
 
 class CustomerRepositoryImpl extends CustomerRepository {
   async save(customer) {

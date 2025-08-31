@@ -3,37 +3,42 @@ const { body } = require('express-validator');
 const TaxController = require('../controllers/TaxController');
 const { handleValidationErrors } = require('../middleware/validation');
 const { requireRole } = require('../middleware/role');
-const rateLimitMiddleware = require('../middleware/rateLimit');
+const { standardLimit } = require('../middleware/rateLimit');
+
+// Import services
+const TaxService = require('../../domain/services/TaxService');
 
 const router = express.Router();
 
-const taxController = new TaxController('../../application/services/TaxService');
+// Initialize dependencies (simplified for now)
+const taxService = new TaxService(null, null); // Will be properly injected in production
+const taxController = new TaxController(taxService);
 
 // Routes
 router.get('/config',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   taxController.getTaxConfiguration.bind(taxController)
 );
 
 router.put('/config',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   requireRole(['admin', 'manager']),
-  body('vatRate').isFloat({ min: 0, max: 1 }),
-  body('corporateTaxRate').isFloat({ min: 0, max: 1 }),
-  body('exemptionThreshold').isFloat({ min: 0 }),
+  body('vatRate').optional().isFloat({ min: 0, max: 1 }),
+  body('corporateTaxRate').optional().isFloat({ min: 0, max: 1 }),
+  body('exemptionThreshold').optional().isFloat({ min: 0 }),
   handleValidationErrors,
   taxController.updateTaxConfiguration.bind(taxController)
 );
 
 router.post('/validate-tax-number',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   body('taxNumber').isLength({ min: 15, max: 15 }),
   handleValidationErrors,
   taxController.validateTaxNumber.bind(taxController)
 );
 
 router.post('/vat-return',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   requireRole(['admin', 'manager', 'accountant']),
   body('period').isIn(['monthly', 'quarterly', 'annually']),
   body('startDate').isISO8601().toDate(),
@@ -43,7 +48,7 @@ router.post('/vat-return',
 );
 
 router.get('/rates',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   taxController.getTaxRates.bind(taxController)
 );
 

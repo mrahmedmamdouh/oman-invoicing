@@ -4,12 +4,22 @@ const CustomerController = require('../controllers/CustomerController');
 const { handleValidationErrors } = require('../middleware/validation');
 const { requireRole, requirePermission } = require('../middleware/role');
 const { auditLogger } = require('../middleware/audit');
-const rateLimitMiddleware = require('../middleware/rateLimit');
+const { standardLimit, createLimit } = require('../middleware/rateLimit');
+
+// Import services and repositories
+const CustomerService = require('../../domain/services/CustomerService');
+const CustomerRepositoryImpl = require('../../infrastructure/database/repositories/CustomerRepositoryImpl');
+const AuditService = require('../../domain/services/AuditService');
+const AuditRepositoryImpl = require('../../infrastructure/database/repositories/AuditRepositoryImpl');
 
 const router = express.Router();
 
-// Initialize controller (in real app, this would be done through DI container)
-const customerController = new CustomerController('../../application/services/CustomerService');
+// Initialize dependencies
+const customerRepository = new CustomerRepositoryImpl();
+const auditRepository = new AuditRepositoryImpl();
+const auditService = new AuditService(auditRepository);
+const customerService = new CustomerService(customerRepository, auditService);
+const customerController = new CustomerController(customerService);
 
 // Validation rules
 const createCustomerValidation = [
@@ -32,26 +42,26 @@ const updateCustomerValidation = [
 
 // Routes
 router.get('/',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   requirePermission('manage_customers'),
   customerController.getCustomers.bind(customerController)
 );
 
 router.get('/search',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   query('query').isLength({ min: 2 }),
   handleValidationErrors,
   customerController.searchCustomers.bind(customerController)
 );
 
 router.get('/:id',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   requirePermission('manage_customers'),
   customerController.getCustomerById.bind(customerController)
 );
 
 router.post('/',
-  rateLimitMiddleware.createLimit,
+  createLimit,
   requirePermission('manage_customers'),
   createCustomerValidation,
   handleValidationErrors,
@@ -60,7 +70,7 @@ router.post('/',
 );
 
 router.put('/:id',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   requirePermission('manage_customers'),
   updateCustomerValidation,
   handleValidationErrors,
@@ -69,7 +79,7 @@ router.put('/:id',
 );
 
 router.delete('/:id',
-  rateLimitMiddleware.standardLimit,
+  standardLimit,
   requireRole(['admin', 'manager']),
   auditLogger('delete'),
   customerController.deleteCustomer.bind(customerController)

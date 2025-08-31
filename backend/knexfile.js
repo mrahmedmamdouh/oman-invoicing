@@ -1,4 +1,3 @@
-cat > backend/knexfile.js << 'EOF'
 require('dotenv').config();
 
 module.exports = {
@@ -39,4 +38,3 @@ module.exports = {
     }
   }
 };
-EOF

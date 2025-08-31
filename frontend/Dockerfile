@@ -13,7 +13,8 @@ COPY package*.json ./
 COPY . .
 
 # Build the app
-
+RUN npm run build
+RUN npm install 
 # Production stage
 FROM nginx:alpine
 

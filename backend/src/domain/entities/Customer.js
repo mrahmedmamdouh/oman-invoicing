@@ -1,3 +1,5 @@
+const { v4: uuidv4 } = require('uuid');
+
 class Customer {
   constructor(data = {}) {
     this.id = data.id || uuidv4();
@@ -53,3 +55,5 @@ class Customer {
     };
   }
 }
+
+module.exports = { Customer };

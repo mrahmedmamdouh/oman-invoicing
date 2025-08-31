@@ -1,0 +1,95 @@
+.btn-oman-primary {
+  background: linear-gradient(135deg, #C8102E 0%, #a50d26 100%);
+  border-color: #C8102E;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-oman-primary:hover,
+.btn-oman-primary:focus {
+  background: linear-gradient(135deg, #a50d26 0%, #8a0b20 100%);
+  border-color: #a50d26;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+}
+
+.btn-oman-secondary {
+  background: linear-gradient(135deg, #009639 0%, #007a2e 100%);
+  border-color: #009639;
+  color: white;
+}
+
+.btn-oman-secondary:hover,
+.btn-oman-secondary:focus {
+  background: linear-gradient(135deg, #007a2e 0%, #006325 100%);
+  border-color: #007a2e;
+  color: white;
+}
+
+.btn-ghost-oman {
+  border-color: #C8102E;
+  color: #C8102E;
+  background: transparent;
+}
+
+.btn-ghost-oman:hover,
+.btn-ghost-oman:focus {
+  background: rgba(200, 16, 46, 0.1);
+  border-color: #C8102E;
+  color: #C8102E;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-floating {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.btn-floating:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* RTL Support for Buttons */
+.rtl .btn-action {
+  flex-direction: row-reverse;
+}
+
+.rtl .btn-floating {
+  right: auto;
+  left: 24px;
+}
+
+/* Button Groups */
+.btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-group.vertical {
+  flex-direction: column;
+}
+
+.rtl .btn-group {
+  flex-direction: row-reverse;
+}
+
+.rtl .btn-group.vertical {
+  flex-direction: column;
+}

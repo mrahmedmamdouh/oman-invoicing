@@ -3,10 +3,18 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
+const fs = require('fs');
 
 const errorHandler = require('./presentation/middleware/errorHandler');
 const authMiddleware = require('./presentation/middleware/auth');
 const logger = require('./shared/utils/logger');
+
+// Ensure logs directory exists
+const logsDir = path.join(__dirname, '../logs');
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
 
 // Import routes
 const authRoutes = require('./presentation/routes/auth');
@@ -14,6 +22,7 @@ const invoiceRoutes = require('./presentation/routes/invoices');
 const customerRoutes = require('./presentation/routes/customers');
 const taxRoutes = require('./presentation/routes/tax');
 const peppolRoutes = require('./presentation/routes/peppol');
+const reportRoutes = require('./presentation/routes/reports');
 
 const app = express();
 
@@ -75,6 +84,7 @@ app.use('/api/invoices', authMiddleware, invoiceRoutes);
 app.use('/api/customers', authMiddleware, customerRoutes);
 app.use('/api/tax', authMiddleware, taxRoutes);
 app.use('/api/peppol', authMiddleware, peppolRoutes);
+app.use('/api/reports', authMiddleware, reportRoutes);
 
 // Error handling
 app.use(errorHandler);
